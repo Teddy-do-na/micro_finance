@@ -1,0 +1,123 @@
+rules_version = '2';
+
+service cloud.firestore {
+  match /databases/{database}/documents {
+    
+    // 0. Default Deny
+    match /{document=**} {
+      allow read, write: if false;
+    }
+
+    // --- GLOBALS ---
+    function isSignedIn() {
+      return request.auth != null;
+    }
+
+    function isAdmin() {
+      // Bootstrapped admin from runtime
+      return isSignedIn() && (
+        request.auth.token.email == 'alliancekomta2001@gmail.com' ||
+        exists(/databases/$(database)/documents/admins/$(request.auth.uid))
+      );
+    }
+
+    function isValidId(id) {
+      return id is string && id.size() <= 128 && id.matches('^[a-zA-Z0-9_\\-]+$');
+    }
+
+    function incoming() { return request.resource.data; }
+    function existing() { return resource.data; }
+
+    // --- USERS ---
+    match /users/{userId} {
+      function isValidUser(data) {
+        return data.uid == userId &&
+               data.email is string &&
+               data.role in ['director', 'credit_manager', 'cashier', 'accountant', 'savings_manager', 'secretary', 'auditor', 'super_admin', 'member'] &&
+               data.keys().hasAll(['uid', 'email', 'role']);
+      }
+      allow get: if isSignedIn() && isValidId(userId) && (request.auth.uid == userId || isAdmin());
+      allow create: if isSignedIn() && isValidId(userId) && request.auth.uid == userId && isValidUser(incoming());
+      allow update: if isSignedIn() && isValidId(userId) && request.auth.uid == userId && isValidUser(incoming()) &&
+                       incoming().role == existing().role; // Role cannot be changed by user
+    }
+
+    // --- MEMBERS ---
+    match /members/{memberId} {
+      function isValidMember(data) {
+        return data.type in ['individual', 'group'] &&
+               data.status in ['active', 'pending', 'suspended', 'closed'] &&
+               data.shares is number && data.shares >= 0 &&
+               data.createdAt == request.time &&
+               data.keys().hasAll(['type', 'status', 'shares', 'createdAt', 'updatedAt', 'createdBy']) &&
+               data.keys().size() <= 15;
+      }
+
+      allow list: if isSignedIn();
+      allow get: if isSignedIn() && isValidId(memberId);
+      
+      allow create: if isSignedIn() && isValidId(memberId) && isValidMember(incoming()) && 
+                       incoming().createdBy == request.auth.uid;
+                        
+      allow update: if isSignedIn() && isValidId(memberId) && (
+        // Action: Update Profile
+        (incoming().diff(existing()).affectedKeys().hasOnly(['firstName', 'lastName', 'phone', 'address', 'updatedAt']) && 
+         incoming().updatedAt == request.time) ||
+        // Action: Change Status (Admin only)
+        (isAdmin() && incoming().diff(existing()).affectedKeys().hasOnly(['status', 'updatedAt']))
+      );
+    }
+
+    // --- LOANS ---
+    match /loans/{loanId} {
+      function isValidLoan(data) {
+        return data.memberId is string && exists(/databases/$(database)/documents/members/$(data.memberId)) &&
+               data.amount is number && data.amount > 0 &&
+               data.status in ['draft', 'pending_review', 'approved', 'active', 'repaid', 'defaulted'] &&
+               data.createdAt == request.time &&
+               data.keys().hasAll(['memberId', 'amount', 'status', 'createdAt', 'updatedAt']);
+      }
+
+      allow list: if isSignedIn();
+      allow get: if isSignedIn() && isValidId(loanId);
+
+      allow create: if isSignedIn() && isValidId(loanId) && isValidLoan(incoming());
+
+      allow update: if isSignedIn() && isValidId(loanId) && (
+        // Action: Submit for Review
+        (existing().status == 'draft' && incoming().status == 'pending_review' && 
+         incoming().diff(existing()).affectedKeys().hasOnly(['status', 'updatedAt'])) ||
+        // Action: Approve (Admin only)
+        (isAdmin() && existing().status == 'pending_review' && incoming().status == 'approved' &&
+         incoming().diff(existing()).affectedKeys().hasOnly(['status', 'updatedAt'])) ||
+        // Action: Disburse
+        (isAdmin() && existing().status == 'approved' && incoming().status == 'active' &&
+         incoming().diff(existing()).affectedKeys().hasOnly(['status', 'disbursementDate', 'updatedAt']))
+      );
+    }
+
+    // --- TRANSACTIONS (IMMUTABLE) ---
+    match /transactions/{txId} {
+      function isValidTransaction(data) {
+        return data.amount is number &&
+               data.type in ['deposit', 'withdrawal', 'loan_disbursement', 'loan_repayment', 'interest_credit'] &&
+               data.timestamp == request.time &&
+               data.performedBy == request.auth.uid;
+      }
+
+      allow read: if isSignedIn() && isValidId(txId);
+      allow create: if isSignedIn() && isValidId(txId) && isValidTransaction(incoming());
+      allow update, delete: if false; // Transactions are immutable
+    }
+
+    // --- SYSTEM ---
+    match /system/{docId} {
+        allow read: if isSignedIn();
+    }
+    
+    match /admins/{adminId} {
+        allow read: if isSignedIn();
+        allow write: if false; // Managed via Firebase Console
+    }
+  }
+}

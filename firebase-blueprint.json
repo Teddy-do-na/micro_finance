@@ -1,0 +1,121 @@
+{
+  "entities": {
+    "Member": {
+      "title": "Member",
+      "description": "Represents an individual or group member of the cooperative.",
+      "type": "object",
+      "properties": {
+        "id": { "type": "string" },
+        "type": { "type": "string", "enum": ["individual", "group"] },
+        "firstName": { "type": "string" },
+        "lastName": { "type": "string" },
+        "groupName": { "type": "string" },
+        "birthDate": { "type": "string", "format": "date" },
+        "idType": { "type": "string" },
+        "idNumber": { "type": "string" },
+        "idExpiry": { "type": "string", "format": "date" },
+        "phone": { "type": "string" },
+        "address": { "type": "string" },
+        "photoUrl": { "type": "string" },
+        "status": { "type": "string", "enum": ["pending", "active", "suspended", "closed"] },
+        "shares": { "type": "number", "description": "Number of social shares" },
+        "createdAt": { "type": "string", "format": "date-time" },
+        "updatedAt": { "type": "string", "format": "date-time" },
+        "createdBy": { "type": "string" }
+      },
+      "required": ["type", "status", "createdAt"]
+    },
+    "Loan": {
+      "title": "Loan",
+      "description": "Represents a credit facility granted to a member.",
+      "type": "object",
+      "properties": {
+        "id": { "type": "string" },
+        "memberId": { "type": "string" },
+        "amount": { "type": "number" },
+        "durationMonths": { "type": "number" },
+        "interestRate": { "type": "number" },
+        "purpose": { "type": "string" },
+        "status": { "type": "string", "enum": ["draft", "pending_review", "approved", "active", "rejected", "repaid", "defaulted"] },
+        "disbursementDate": { "type": "string", "format": "date-time" },
+        "repaymentSchedule": { "type": "array" },
+        "guarantees": { "type": "string" },
+        "scoring": { "type": "number" },
+        "createdAt": { "type": "string", "format": "date-time" },
+        "updatedAt": { "type": "string", "format": "date-time" }
+      },
+      "required": ["memberId", "amount", "status", "createdAt"]
+    },
+    "SavingAccount": {
+      "title": "Saving Account",
+      "description": "Represents a savings deposit account for a member.",
+      "type": "object",
+      "properties": {
+        "id": { "type": "string" },
+        "memberId": { "type": "string" },
+        "accountType": { "type": "string", "enum": ["voluntary", "mandatory", "term"] },
+        "balance": { "type": "number" },
+        "interestRate": { "type": "number" },
+        "status": { "type": "string", "enum": ["active", "closed"] },
+        "createdAt": { "type": "string", "format": "date-time" }
+      },
+      "required": ["memberId", "accountType", "balance", "status"]
+    },
+    "Transaction": {
+      "title": "Transaction",
+      "description": "Any financial movement (deposit, withdrawal, loan repayment).",
+      "type": "object",
+      "properties": {
+        "id": { "type": "string" },
+        "accountId": { "type": "string" },
+        "loanId": { "type": "string" },
+        "amount": { "type": "number" },
+        "type": { "type": "string", "enum": ["deposit", "withdrawal", "loan_disbursement", "loan_repayment", "interest_credit"] },
+        "method": { "type": "string", "enum": ["cash", "mobile_money", "transfer"] },
+        "reference": { "type": "string" },
+        "timestamp": { "type": "string", "format": "date-time" },
+        "performedBy": { "type": "string" }
+      },
+      "required": ["amount", "type", "method", "timestamp"]
+    },
+    "UserProfile": {
+      "title": "User Profile",
+      "description": "Internal staff profile and role within the CMCC.",
+      "type": "object",
+      "properties": {
+        "uid": { "type": "string" },
+        "email": { "type": "string" },
+        "displayName": { "type": "string" },
+        "role": { "type": "string", "enum": ["director", "credit_officer", "cashier", "admin", "agent"] },
+        "agency": { "type": "string" }
+      },
+      "required": ["uid", "email", "role"]
+    }
+  },
+  "firestore": {
+    "users": {
+      "schema": "UserProfile",
+      "description": "System users and their roles."
+    },
+    "members": {
+      "schema": "Member",
+      "description": "Collection of cooperative members."
+    },
+    "loans": {
+      "schema": "Loan",
+      "description": "Member loans and credit history."
+    },
+    "savings": {
+      "schema": "SavingAccount",
+      "description": "Savings accounts and balances."
+    },
+    "transactions": {
+      "schema": "Transaction",
+      "description": "History of all financial movements."
+    },
+    "accounting_entries": {
+      "schema": "Transaction",
+      "description": "Journal entries for the general ledger."
+    }
+  }
+}
