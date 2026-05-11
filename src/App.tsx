@@ -282,18 +282,18 @@ export default function App() {
 
   if (!user) {
     return (
-      <div className="h-screen w-full flex bg-[#020617] overflow-hidden font-sans relative">
+      <div className="min-h-screen w-full flex flex-col lg:flex-row bg-[#020617] overflow-y-auto font-sans relative">
         {/* Background Image / Artistic Layer */}
-        <div className="absolute inset-0 z-0">
+        <div className="fixed inset-0 z-0">
           <div className="absolute inset-0 bg-[url('https://images.unsplash.com/photo-1550751827-4bd374c3f58b?auto=format&fit=crop&q=80&w=2070')] bg-cover bg-center opacity-20 transition-opacity duration-1000" />
           <div className="absolute inset-0 bg-gradient-to-br from-[#020617] via-[#020617]/90 to-[#06231C]/40" />
           <div className="absolute inset-0 opacity-10 bg-[linear-gradient(to_right,#1e293b_1px,transparent_1px),linear-gradient(to_bottom,#1e293b_1px,transparent_1px)] [background-size:60px_60px]" />
         </div>
 
-        {/* Left Content Pane */}
-        <div className="hidden lg:flex w-7/12 relative flex-col justify-between p-24 z-10">
+        {/* Left Content Pane - Branding */}
+        <div className="hidden lg:flex lg:w-7/12 relative flex-col justify-between p-12 xl:p-24 z-10 h-screen sticky top-0">
           <div className="relative">
-            <div className="flex items-center gap-5 mb-24">
+            <div className="flex items-center gap-5 mb-16 xl:mb-24">
               <div className="w-14 h-14 bg-emerald-500 rounded-2xl flex items-center justify-center text-white shadow-[0_0_40px_rgba(16,185,129,0.3)]">
                 <LayoutDashboard className="w-8 h-8" />
               </div>
@@ -306,13 +306,13 @@ export default function App() {
             <div className="space-y-10">
               <div className="space-y-4">
                 <span className="inline-block px-3 py-1 bg-emerald-500/10 border border-emerald-500/20 rounded-full text-emerald-400 text-[10px] font-black uppercase tracking-widest">Institution Certifiée</span>
-                <h2 className="text-white text-7xl font-[900] leading-[0.9] tracking-tighter max-w-xl">
+                <h2 className="text-white text-5xl xl:text-7xl font-[900] leading-[0.9] tracking-tighter max-w-xl">
                   L'Elite de la <br/>
                   <span className="text-transparent bg-clip-text bg-gradient-to-r from-emerald-400 to-emerald-600">Micro-Finance</span> <br/>
                   en RCA<span className="text-emerald-500">.</span>
                 </h2>
               </div>
-              <p className="text-slate-400 text-xl max-w-sm font-medium opacity-60 leading-relaxed">
+              <p className="text-slate-400 text-lg xl:text-xl max-w-sm font-medium opacity-60 leading-relaxed">
                 Connectez-vous pour accéder au portail métier de la COOPÉRATIVE DE MICRO-FINANCE.
               </p>
             </div>
@@ -333,17 +333,22 @@ export default function App() {
         </div>
 
         {/* Right Auth Pane */}
-        <div className="flex-1 flex flex-col justify-center p-8 lg:p-24 bg-white dark:bg-[#020617] relative z-10 transition-colors duration-500 shadow-[-40px_0_100px_rgba(0,0,0,0.5)]">
-          <div className="max-w-md w-full mx-auto space-y-10">
+        <div className="flex-1 flex flex-col justify-center min-h-screen p-6 sm:p-12 lg:p-24 bg-white dark:bg-[#020617] relative z-20 transition-colors duration-500 shadow-none lg:shadow-[-40px_0_100px_rgba(0,0,0,0.5)]">
+          <div className="max-w-md w-full mx-auto space-y-8 xl:space-y-10 py-12 lg:py-0">
             <header className="space-y-2">
-              <div className="lg:hidden flex items-center gap-4 mb-10">
-                <div className="w-10 h-10 bg-emerald-500 rounded-xl flex items-center justify-center text-white shadow-lg">CM</div>
-                <h1 className="text-slate-900 dark:text-white font-black text-xl tracking-tighter">CMCC</h1>
+              <div className="lg:hidden flex items-center justify-between gap-4 mb-12">
+                <div className="flex items-center gap-3">
+                  <div className="w-10 h-10 bg-emerald-500 rounded-xl flex items-center justify-center text-white shadow-lg">
+                    <LayoutDashboard className="w-5 h-5" />
+                  </div>
+                  <h1 className="text-slate-900 dark:text-white font-black text-xl italic tracking-tighter">CMCC<span className="text-emerald-500">.</span>RCA</h1>
+                </div>
+                <div className="text-[8px] font-black text-slate-400 uppercase tracking-[0.2em] bg-slate-100 dark:bg-white/5 px-3 py-1 rounded-full">v2.6.4</div>
               </div>
-              <h3 className="text-slate-900 dark:text-white text-4xl font-black tracking-tight leading-none italic underline decoration-emerald-500 decoration-8 underline-offset-8">
+              <h3 className="text-slate-900 dark:text-white text-3xl sm:text-4xl font-black tracking-tight leading-none italic underline decoration-emerald-500 decoration-8 underline-offset-8">
                 {authMode === 'login' ? 'Portail Accès' : 'Nouveau Compte'}
               </h3>
-              <p className="text-slate-400 dark:text-slate-500 font-bold text-sm tracking-tight opacity-70 uppercase mt-4">Système d'Information • v2.6</p>
+              <p className="hidden lg:block text-slate-400 dark:text-slate-500 font-bold text-sm tracking-tight opacity-70 uppercase mt-4">Système d'Information • v2.6</p>
             </header>
 
             {/* Mode Switcher */}

@@ -1,4 +1,4 @@
-import React from 'react';
+import React, { useState } from 'react';
 import { User } from 'firebase/auth';
 import { 
   LayoutDashboard, 
@@ -13,7 +13,9 @@ import {
   Wifi,
   ChevronRight,
   Sun,
-  Moon
+  Moon,
+  Menu,
+  X
 } from 'lucide-react';
 import { cn } from '../lib/utils';
 import { UserRole, UserProfile } from '../types';
@@ -39,6 +41,8 @@ export function Layout({
   isDarkMode,
   onToggleDarkMode
 }: LayoutProps) {
+  const [isMobileMenuOpen, setIsMobileMenuOpen] = useState(false);
+
   const menuItems = [
     { id: 'dashboard', label: 'Tableau de bord', icon: LayoutDashboard, roles: Object.values(UserRole) },
     { id: 'members', label: 'Membres', icon: Users, roles: [UserRole.SUPER_ADMIN, UserRole.SECRETARY, UserRole.CASHIER, UserRole.SAVINGS_MANAGER, UserRole.CREDIT_MANAGER, UserRole.DIRECTOR, UserRole.AUDITOR, UserRole.ACCOUNTANT, UserRole.MEMBER] },
@@ -56,12 +60,28 @@ export function Layout({
   const filteredNav = menuItems.filter(item => item.roles.includes(role));
   const filteredSystem = systemItems.filter(item => item.roles.includes(role));
 
+  const handleNavClick = (view: any) => {
+    onViewChange(view);
+    setIsMobileMenuOpen(false);
+  };
+
   return (
     <div className="flex h-screen bg-[var(--bg-main)] overflow-hidden font-sans transition-colors duration-300">
-      {/* Sidebar - Dark Professional (Capture 3 style) */}
-      <aside className="w-68 bg-[#06231C] text-white/70 flex flex-col shrink-0 border-r border-[#0B2F26] z-20">
-        <div className="p-6">
-          <div className="flex items-center gap-3 mb-2">
+      {/* Mobile Backdrop */}
+      {isMobileMenuOpen && (
+        <div 
+          className="fixed inset-0 bg-slate-900/60 backdrop-blur-sm z-30 lg:hidden"
+          onClick={() => setIsMobileMenuOpen(false)}
+        />
+      )}
+
+      {/* Sidebar - Responsive */}
+      <aside className={cn(
+        "fixed lg:static inset-y-0 left-0 w-72 bg-[#06231C] text-white/70 flex flex-col shrink-0 border-r border-[#0B2F26] z-40 transition-transform duration-300 lg:translate-x-0 shadow-2xl lg:shadow-none",
+        isMobileMenuOpen ? "translate-x-0" : "-translate-x-full"
+      )}>
+        <div className="p-6 flex items-center justify-between">
+          <div className="flex items-center gap-3">
             <div className="w-10 h-10 bg-emerald-500 rounded-xl flex items-center justify-center text-white font-black text-xl shadow-[0_0_20px_rgba(16,185,129,0.2)]">
               CM
             </div>
@@ -70,6 +90,12 @@ export function Layout({
               <p className="text-[9px] text-emerald-400 font-bold uppercase tracking-[0.1em] mt-1 truncate">Crédit Centrafrique</p>
             </div>
           </div>
+          <button 
+            onClick={() => setIsMobileMenuOpen(false)}
+            className="lg:hidden p-2 text-white/40 hover:text-white"
+          >
+            <X className="w-6 h-6" />
+          </button>
         </div>
 
         <div className="flex-1 px-4 py-2 space-y-8 overflow-y-auto">
@@ -79,7 +105,7 @@ export function Layout({
               {filteredNav.map((item) => (
                 <button
                   key={item.id}
-                  onClick={() => onViewChange(item.id)}
+                  onClick={() => handleNavClick(item.id)}
                   className={cn(
                     "w-full flex items-center justify-between px-4 py-3 rounded-xl transition-all group",
                     currentView === item.id 
@@ -108,7 +134,7 @@ export function Layout({
                 {filteredSystem.map((item) => (
                   <button
                     key={item.id}
-                    onClick={() => onViewChange(item.id)}
+                    onClick={() => handleNavClick(item.id)}
                     className={cn(
                       "w-full flex items-center gap-3.5 px-4 py-3 rounded-xl transition-all group",
                       currentView === item.id 
@@ -154,15 +180,23 @@ export function Layout({
 
       {/* Main Content */}
       <main className="flex-1 flex flex-col overflow-hidden">
-        <header className="h-20 bg-[var(--bg-card)] border-b border-[var(--border)] flex items-center justify-between px-8 shrink-0 z-10 transition-colors duration-300">
-          <div className="space-y-0.5">
-            <h2 className="text-xl font-[900] text-[var(--text-main)] tracking-tight leading-none uppercase italic underline decoration-emerald-500/20 underline-offset-4">
-              {menuItems.find(i => i.id === currentView)?.label || currentView}
-            </h2>
-            <p className="text-[11px] text-[var(--text-muted)] font-bold tracking-tight opacity-70 italic">Système CMCC — Crédit Centrafrique</p>
+        <header className="h-20 bg-[var(--bg-card)] border-b border-[var(--border)] flex items-center justify-between px-4 sm:px-8 shrink-0 z-10 transition-colors duration-300 gap-4">
+          <div className="flex items-center gap-4">
+            <button 
+              onClick={() => setIsMobileMenuOpen(true)}
+              className="lg:hidden p-2 text-[var(--text-muted)] hover:bg-slate-100 dark:hover:bg-white/5 rounded-xl transition-colors"
+            >
+              <Menu className="w-6 h-6" />
+            </button>
+            <div className="space-y-0.5">
+              <h2 className="text-lg sm:text-xl font-[900] text-[var(--text-main)] tracking-tight leading-none uppercase italic underline decoration-emerald-500/20 underline-offset-4 truncate">
+                {menuItems.find(i => i.id === currentView)?.label || currentView}
+              </h2>
+              <p className="text-[10px] sm:text-[11px] text-[var(--text-muted)] font-bold tracking-tight opacity-70 italic truncate">Système CMCC — Crédit Centrafrique</p>
+            </div>
           </div>
           
-          <div className="flex items-center gap-4">
+          <div className="flex items-center gap-2 sm:gap-4">
             {/* Dark Mode Toggle */}
             <button 
               onClick={onToggleDarkMode}
@@ -198,8 +232,8 @@ export function Layout({
           </div>
         </header>
 
-        <div className="flex-1 overflow-auto">
-          <div className="max-w-[1600px] mx-auto p-8">
+        <div className="flex-1 overflow-auto bg-[var(--bg-main)]">
+          <div className="max-w-[1600px] mx-auto p-4 sm:p-8">
             {children}
           </div>
         </div>

@@ -78,60 +78,60 @@ export function AdminDashboard({ members, loans, transactions, isDarkMode, onVie
   return (
     <div className="space-y-10 animate-in fade-in zoom-in duration-1000">
       {/* Role-Specific Horizontal Task Bar */}
-      <div className="flex flex-wrap gap-4 p-4 bg-slate-900/5 dark:bg-white/5 rounded-[4rem] border border-[var(--border)] backdrop-blur-md">
+      <div className="flex flex-wrap gap-3 sm:gap-4 p-3 sm:p-4 bg-slate-900/5 dark:bg-white/5 rounded-3xl sm:rounded-[4rem] border border-[var(--border)] backdrop-blur-md">
         {adminModules.map((mod, i) => (
           <button 
             key={i} 
             onClick={() => onViewChange?.(mod.view)}
-            className="flex-1 min-w-[200px] flex items-center gap-5 p-7 bg-white dark:bg-[#0B1224] rounded-[3.5rem] border border-[var(--border)] hover:border-slate-950 dark:hover:border-white hover:bg-slate-900 dark:hover:bg-white hover:text-white dark:hover:text-slate-950 transition-all group shadow-sm"
+            className="flex-1 min-w-[140px] sm:min-w-[200px] flex items-center gap-4 sm:gap-5 p-4 sm:p-7 bg-white dark:bg-[#0B1224] rounded-2xl sm:rounded-[3.5rem] border border-[var(--border)] hover:border-slate-950 dark:hover:border-white hover:bg-slate-900 dark:hover:bg-white hover:text-white dark:hover:text-slate-950 transition-all group shadow-sm"
           >
-            <div className="p-4 rounded-[1.8rem] bg-slate-100 dark:bg-white/5 group-hover:bg-white/20 transition-colors shadow-inner">
-              <mod.icon className="w-8 h-8" />
+            <div className="p-3 sm:p-4 rounded-xl sm:rounded-[1.8rem] bg-slate-100 dark:bg-white/5 group-hover:bg-white/20 transition-colors shadow-inner">
+              <mod.icon className="w-6 h-6 sm:w-8 sm:h-8" />
             </div>
             <div className="text-left">
-              <p className="text-[12px] font-[900] uppercase tracking-tight leading-none italic">{mod.label}</p>
-              <p className="text-[9px] font-bold opacity-40 uppercase tracking-[0.2em] mt-2 leading-none italic">{mod.desc}</p>
+              <p className="text-[11px] sm:text-[12px] font-[900] uppercase tracking-tight leading-none italic uppercase">{mod.label}</p>
+              <p className="text-[8px] sm:text-[9px] font-bold opacity-40 uppercase tracking-[0.2em] mt-1 sm:mt-2 leading-none italic uppercase">{mod.desc}</p>
             </div>
           </button>
         ))}
       </div>
 
-      <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-8">
+      <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-6 sm:gap-8">
         {stats.map((stat, i) => (
-          <div key={i} className="bg-[var(--bg-card)] p-12 rounded-[4.5rem] border border-[var(--border)] shadow-md group hover:shadow-4xl transition-all relative overflow-hidden">
-             <div className="absolute top-0 right-0 p-10 opacity-[0.03] scale-150 rotate-45 group-hover:rotate-90 transition-transform duration-1000">
-                <stat.icon className="w-48 h-48" />
+          <div key={i} className="bg-[var(--bg-card)] p-8 sm:p-12 rounded-3xl sm:rounded-[4.5rem] border border-[var(--border)] shadow-md group hover:shadow-4xl transition-all relative overflow-hidden">
+             <div className="absolute top-0 right-0 p-8 sm:p-10 opacity-[0.03] scale-150 rotate-45 group-hover:rotate-90 transition-transform duration-1000">
+                <stat.icon className="w-32 h-32 sm:w-48 sm:h-48" />
              </div>
-             <div className="flex justify-between items-start mb-12">
-              <div className="p-5 rounded-3xl shadow-sm transform group-hover:scale-125 transition-transform" style={{ backgroundColor: `${stat.color}15`, color: stat.color }}>
-                <stat.icon className="w-10 h-10" />
+             <div className="flex justify-between items-start mb-8 sm:mb-12">
+              <div className="p-4 sm:p-5 rounded-2xl sm:rounded-3xl shadow-sm transform group-hover:scale-125 transition-transform" style={{ backgroundColor: `${stat.color}15`, color: stat.color }}>
+                <stat.icon className="w-8 h-8 sm:w-10 sm:h-10" />
               </div>
             </div>
-            <h3 className="text-5xl font-[900] tracking-tighter text-[var(--text-main)] leading-none mb-4 italic">{stat.value}</h3>
-            <p className="text-[15px] font-[900] text-[var(--text-muted)] uppercase tracking-[0.2em] leading-none italic opacity-60 underline decoration-slate-500/20 underline-offset-8">{stat.label}</p>
-            <p className="mt-8 text-[10px] font-black uppercase tracking-widest bg-slate-100 dark:bg-white/5 px-4 py-1.5 rounded-full inline-block italic" style={{ color: stat.color }}>{stat.trend}</p>
+            <h3 className="text-3xl sm:text-4xl lg:text-5xl font-[900] tracking-tighter text-[var(--text-main)] leading-none mb-3 sm:mb-4 italic">{stat.value}</h3>
+            <p className="text-[13px] sm:text-[15px] font-[900] text-[var(--text-muted)] uppercase tracking-[0.2em] leading-none italic opacity-60 underline decoration-slate-500/20 underline-offset-8">{stat.label}</p>
+            <p className="mt-8 text-[9px] sm:text-[10px] font-black uppercase tracking-widest bg-slate-100 dark:bg-white/5 px-4 py-1.5 rounded-full inline-block italic" style={{ color: stat.color }}>{stat.trend}</p>
           </div>
         ))}
       </div>
 
-      <div className="grid grid-cols-1 lg:grid-cols-3 gap-10">
-        <div className="lg:col-span-2 bg-[var(--bg-card)] p-14 rounded-[5rem] border border-[var(--border)] shadow-md relative overflow-hidden">
-           <div className="flex justify-between items-start mb-16 relative z-10">
+      <div className="grid grid-cols-1 lg:grid-cols-3 gap-8 sm:gap-10">
+        <div className="lg:col-span-2 bg-[var(--bg-card)] p-8 sm:p-14 rounded-3xl sm:rounded-[5rem] border border-[var(--border)] shadow-md relative overflow-hidden">
+           <div className="flex flex-col xl:flex-row justify-between items-start xl:items-center mb-10 sm:mb-16 relative z-10 gap-8">
               <div>
-                 <h3 className="text-3xl font-[900] text-[var(--text-main)] tracking-tight uppercase italic underline decoration-slate-500/20 decoration-8 underline-offset-4">Flux de Trésorerie & Épargne</h3>
-                 <p className="text-[11px] font-black text-[var(--text-muted)] uppercase tracking-[0.4em] mt-5 opacity-40 italic">CONSOLIDATION GLOBALE SYSTÈME 2024</p>
+                 <h3 className="text-2xl sm:text-3xl font-[900] text-[var(--text-main)] tracking-tight uppercase italic underline decoration-slate-500/20 decoration-8 underline-offset-4">Flux de Trésorerie & Épargne</h3>
+                 <p className="text-[10px] sm:text-[11px] font-black text-[var(--text-muted)] uppercase tracking-[0.3em] sm:tracking-[0.4em] mt-3 sm:mt-5 opacity-40 italic">CONSOLIDATION GLOBALE SYSTÈME 2024</p>
               </div>
-              <div className="flex gap-4">
+              <div className="flex flex-wrap gap-4">
                  {secondaryStats.map((s, i) => (
-                   <div key={i} className="px-8 py-4 bg-slate-50 dark:bg-white/5 rounded-[2.5rem] border border-[var(--border)] text-center">
-                      <p className="text-[10px] font-black text-[var(--text-muted)] uppercase tracking-widest mb-1 italic opacity-50">{s.label}</p>
-                      <p className="text-2xl font-[900] italic" style={{ color: s.color }}>{s.value}</p>
+                   <div key={i} className="flex-1 min-w-[140px] px-6 sm:px-8 py-3 sm:py-4 bg-slate-50 dark:bg-white/5 rounded-2xl sm:rounded-[2.5rem] border border-[var(--border)] text-center">
+                      <p className="text-[9px] sm:text-[10px] font-black text-[var(--text-muted)] uppercase tracking-widest mb-1 italic opacity-50 uppercase">{s.label}</p>
+                      <p className="text-xl sm:text-2xl font-[900] italic" style={{ color: s.color }}>{s.value}</p>
                    </div>
                  ))}
               </div>
            </div>
            
-           <div className="h-[400px] relative z-10">
+           <div className="h-[300px] sm:h-[400px] relative z-10">
               <ResponsiveContainer width="100%" height="100%">
                  <AreaChart data={[
                    { x: 'Jan', savings: 4000, loans: 2400 },

@@ -82,7 +82,8 @@ export function MemberList({ members, userProfile }: MemberListProps) {
       </div>
 
       <div className="bg-[var(--bg-card)] rounded-xl border border-[var(--border)] shadow-sm overflow-hidden">
-        <div className="grid grid-cols-[70px,1.5fr,1fr,1fr,1fr] bg-slate-50 dark:bg-white/5 border-b border-[var(--border)]">
+        {/* Desktop Header - Hidden on mobile */}
+        <div className="hidden sm:grid grid-cols-[70px,1.5fr,1fr,1fr,1fr] bg-slate-50 dark:bg-white/5 border-b border-[var(--border)]">
           <span className="text-[9px] uppercase font-black text-[var(--text-muted)] p-3.5 border-r border-[var(--border)] tracking-wider">Type</span>
           <span className="text-[9px] uppercase font-black text-[var(--text-muted)] p-3.5 border-r border-[var(--border)] tracking-wider">Identité / Raison Sociale</span>
           <span className="text-[9px] uppercase font-black text-[var(--text-muted)] p-3.5 border-r border-[var(--border)] tracking-wider">Adhésion</span>
@@ -91,40 +92,80 @@ export function MemberList({ members, userProfile }: MemberListProps) {
         </div>
 
         {filteredMembers.length === 0 ? (
-          <div className="p-16 text-center opacity-40 font-black text-[10px] uppercase tracking-[0.3em] bg-[var(--bg-card)]">
+          <div className="p-10 sm:p-16 text-center opacity-40 font-black text-[9px] sm:text-[10px] uppercase tracking-[0.2em] sm:tracking-[0.3em] bg-[var(--bg-card)]">
             Aucun membre enregistré dans la base
           </div>
         ) : (
-          filteredMembers.map((member) => (
-            <div key={member.id} className="grid grid-cols-[70px,1.5fr,1fr,1fr,1fr] group border-b border-[var(--border)] last:border-b-0 hover:bg-slate-50 dark:hover:bg-white/5 transition-all bg-[var(--bg-card)]">
-              <div className="p-3.5 flex items-center justify-center border-r border-[var(--border)]">
-                <span className={cn(
-                  "text-[8px] font-black uppercase px-2 py-0.5 rounded-full border",
-                  member.type === MemberType.INDIVIDUAL 
-                    ? "bg-slate-50 dark:bg-slate-800 border-slate-200 dark:border-slate-700 text-slate-500" 
-                    : "bg-emerald-50 dark:bg-emerald-500/10 border-emerald-100 dark:border-emerald-500/20 text-emerald-600 dark:text-emerald-400"
-                )}>
-                  {member.type === MemberType.INDIVIDUAL ? 'IND' : 'GRP'}
-                </span>
+          <div className="divide-y divide-[var(--border)]">
+            {filteredMembers.map((member) => (
+              <div key={member.id} className="p-4 sm:p-0 group transition-all bg-[var(--bg-card)] hover:bg-slate-50 dark:hover:bg-white/5">
+                {/* Mobile Layout: Card-like */}
+                <div className="sm:hidden space-y-3">
+                  <div className="flex justify-between items-start">
+                    <div className="flex items-center gap-3">
+                      <span className={cn(
+                        "text-[8px] font-black uppercase px-2 py-0.5 rounded-full border",
+                        member.type === MemberType.INDIVIDUAL 
+                          ? "bg-slate-50 dark:bg-slate-800 border-slate-200 dark:border-slate-700 text-slate-500" 
+                          : "bg-emerald-50 dark:bg-emerald-500/10 border-emerald-100 dark:border-emerald-500/20 text-emerald-600 dark:text-emerald-400"
+                      )}>
+                        {member.type === MemberType.INDIVIDUAL ? 'IND' : 'GRP'}
+                      </span>
+                      <p className="font-bold text-[var(--text-main)] text-sm">
+                        {member.type === MemberType.INDIVIDUAL ? `${member.firstName} ${member.lastName}` : member.groupName}
+                      </p>
+                    </div>
+                    <div className={cn(
+                      "w-2 h-2 rounded-full",
+                      member.status === MemberStatus.ACTIVE ? "bg-emerald-500 shadow-[0_0_8px_rgba(16,185,129,0.5)]" : "bg-amber-500"
+                    )} />
+                  </div>
+                  
+                  <div className="flex justify-between items-end pt-2">
+                    <div>
+                      <p className="text-[9px] uppercase font-black text-[var(--text-muted)] tracking-wider">Membre depuis</p>
+                      <p className="text-[11px] font-medium text-[var(--text-muted)]">{formatDate(member.createdAt)}</p>
+                    </div>
+                    <div className="text-right">
+                      <p className="text-[11px] font-black text-[var(--text-main)]">
+                        {member.shares} <span className="opacity-40 font-bold ml-1 uppercase text-[8px]">parts</span>
+                      </p>
+                    </div>
+                  </div>
+                </div>
+
+                {/* Desktop Layout: Traditional Grid Row */}
+                <div className="hidden sm:grid grid-cols-[70px,1.5fr,1fr,1fr,1fr] items-center">
+                  <div className="p-3.5 flex items-center justify-center border-r border-[var(--border)]">
+                    <span className={cn(
+                      "text-[8px] font-black uppercase px-2 py-0.5 rounded-full border",
+                      member.type === MemberType.INDIVIDUAL 
+                        ? "bg-slate-50 dark:bg-slate-800 border-slate-200 dark:border-slate-700 text-slate-500" 
+                        : "bg-emerald-50 dark:bg-emerald-500/10 border-emerald-100 dark:border-emerald-500/20 text-emerald-600 dark:text-emerald-400"
+                    )}>
+                      {member.type === MemberType.INDIVIDUAL ? 'IND' : 'GRP'}
+                    </span>
+                  </div>
+                  <div className="p-3.5 border-r border-[var(--border)] font-bold text-[var(--text-main)] text-xs truncate">
+                    {member.type === MemberType.INDIVIDUAL ? `${member.firstName} ${member.lastName}` : member.groupName}
+                  </div>
+                  <div className="p-3.5 border-r border-[var(--border)] text-[11px] font-medium text-[var(--text-muted)]">
+                    {formatDate(member.createdAt)}
+                  </div>
+                  <div className="p-3.5 border-r border-[var(--border)] text-[11px] font-black text-[var(--text-main)] text-right">
+                    {member.shares} <span className="opacity-40 font-bold ml-1 uppercase text-[8px]">parts</span>
+                  </div>
+                  <div className="p-3.5 flex items-center">
+                    <div className={cn(
+                      "w-1.5 h-1.5 rounded-full mr-2 shadow-sm",
+                      member.status === MemberStatus.ACTIVE ? "bg-emerald-500 animate-pulse" : "bg-amber-500"
+                    )} />
+                    <span className="text-[9px] font-black uppercase text-[var(--text-muted)]">{member.status}</span>
+                  </div>
+                </div>
               </div>
-              <div className="p-3.5 border-r border-[var(--border)] font-bold text-[var(--text-main)] text-xs">
-                {member.type === MemberType.INDIVIDUAL ? `${member.firstName} ${member.lastName}` : member.groupName}
-              </div>
-              <div className="p-3.5 border-r border-[var(--border)] text-[11px] font-medium text-[var(--text-muted)]">
-                {formatDate(member.createdAt)}
-              </div>
-              <div className="p-3.5 border-r border-[var(--border)] text-[11px] font-black text-[var(--text-main)] text-right">
-                {member.shares} <span className="opacity-40 font-bold ml-1 uppercase text-[8px]">parts</span>
-              </div>
-              <div className="p-3.5 flex items-center">
-                <div className={cn(
-                  "w-1.5 h-1.5 rounded-full mr-2 shadow-sm",
-                  member.status === MemberStatus.ACTIVE ? "bg-emerald-500 animate-pulse" : "bg-amber-500"
-                )} />
-                <span className="text-[9px] font-black uppercase text-[var(--text-muted)]">{member.status}</span>
-              </div>
-            </div>
-          ))
+            ))}
+          </div>
         )}
       </div>
 

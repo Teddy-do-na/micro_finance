@@ -79,7 +79,8 @@ export function LoanList({ loans, members, userProfile }: LoanListProps) {
       </div>
 
       <div className="bg-[var(--bg-card)] rounded-2xl border border-[var(--border)] shadow-sm overflow-hidden">
-        <div className="grid grid-cols-[1.5fr,1fr,1fr,1fr,auto] border-b border-[var(--border)] bg-slate-50 dark:bg-white/5">
+        {/* Desktop Header - Hidden on mobile */}
+        <div className="hidden sm:grid grid-cols-[1.5fr,1fr,1fr,1fr,auto] border-b border-[var(--border)] bg-slate-50 dark:bg-white/5">
           <span className="text-[9px] uppercase font-black text-[var(--text-muted)] p-4 border-r border-[var(--border)] tracking-wider">Bénéficiaire</span>
           <span className="text-[9px] uppercase font-black text-[var(--text-muted)] p-4 text-right border-r border-[var(--border)] tracking-wider">Montant Principal</span>
           <span className="text-[9px] uppercase font-black text-[var(--text-muted)] p-4 text-center border-r border-[var(--border)] tracking-wider">Note de Crédit</span>
@@ -88,38 +89,80 @@ export function LoanList({ loans, members, userProfile }: LoanListProps) {
         </div>
 
         {loans.length === 0 ? (
-          <div className="p-20 text-center opacity-40 font-black text-[10px] uppercase tracking-[0.3em] bg-[var(--bg-card)]">
+          <div className="p-10 sm:p-20 text-center opacity-40 font-black text-[9px] sm:text-[10px] uppercase tracking-[0.2em] sm:tracking-[0.3em] bg-[var(--bg-card)]">
             Aucun dossier de crédit en cours
           </div>
         ) : (
-          loans.map((loan) => {
-            const borrower = members.find(m => m.id === loan.memberId);
-            return (
-              <div key={loan.id} className="grid grid-cols-[1.5fr,1fr,1fr,1fr,auto] items-center group border-b border-[var(--border)] last:border-b-0 hover:bg-slate-50 dark:hover:bg-white/5 transition-all bg-[var(--bg-card)]">
-                <div className="p-4 border-r border-[var(--border)] font-bold text-[var(--text-main)] text-xs">
-                  {borrower ? (borrower.groupName || `${borrower.firstName} ${borrower.lastName}`) : 'Inconnu'}
+          <div className="divide-y divide-[var(--border)]">
+            {loans.map((loan) => {
+              const borrower = members.find(m => m.id === loan.memberId);
+              return (
+                <div 
+                  key={loan.id} 
+                  className="p-4 sm:p-0 group transition-all bg-[var(--bg-card)] hover:bg-slate-50 dark:hover:bg-white/5"
+                >
+                  {/* Mobile Layout: Card-like */}
+                  <div className="sm:hidden space-y-4">
+                    <div className="flex justify-between items-start">
+                      <div>
+                        <p className="text-[9px] uppercase font-black text-[var(--text-muted)] tracking-wider mb-1">Bénéficiaire</p>
+                        <p className="font-bold text-[var(--text-main)] text-sm">
+                          {borrower ? (borrower.groupName || `${borrower.firstName} ${borrower.lastName}`) : 'Inconnu'}
+                        </p>
+                      </div>
+                      <div className="text-right">
+                        <p className="text-[9px] uppercase font-black text-[var(--text-muted)] tracking-wider mb-1">Montant</p>
+                        <p className="font-black text-[var(--text-main)] text-sm">
+                          {formatCurrency(loan.amount)}
+                        </p>
+                      </div>
+                    </div>
+                    
+                    <div className="flex items-center justify-between pt-2 border-t border-[var(--border)]">
+                      <div className="flex items-center gap-2">
+                        <span className={cn(
+                          "font-black text-[8px] px-2 py-0.5 rounded-full border uppercase tracking-widest",
+                          loan.scoring > 80 ? "bg-emerald-500/10 border-emerald-200 dark:border-emerald-500/20 text-emerald-600 dark:text-emerald-400" : "bg-slate-50 dark:bg-slate-800 border-slate-200 dark:border-slate-700 text-slate-500"
+                        )}>
+                          {loan.scoring}/100
+                        </span>
+                        <div className="flex items-center gap-1.5 uppercase font-black text-[9px] text-[var(--text-muted)]">
+                          {getStatusIcon(loan.status)}
+                          {loan.status.replace('_', ' ')}
+                        </div>
+                      </div>
+                      <ChevronRight className="w-4 h-4 text-emerald-500" />
+                    </div>
+                  </div>
+
+                  {/* Desktop Layout: Traditional Grid Row */}
+                  <div className="hidden sm:grid grid-cols-[1.5fr,1fr,1fr,1fr,auto] items-center">
+                    <div className="p-4 border-r border-[var(--border)] font-bold text-[var(--text-main)] text-xs truncate">
+                      {borrower ? (borrower.groupName || `${borrower.firstName} ${borrower.lastName}`) : 'Inconnu'}
+                    </div>
+                    <div className="p-4 text-right font-black text-[var(--text-main)] border-r border-[var(--border)] text-xs">
+                      {formatCurrency(loan.amount)}
+                    </div>
+                    <div className="p-4 text-center border-r border-[var(--border)]">
+                      <span className={cn(
+                        "font-black text-[8px] px-2 py-0.5 rounded-full border uppercase tracking-widest",
+                        loan.scoring > 80 ? "bg-emerald-500/10 border-emerald-200 dark:border-emerald-500/20 text-emerald-600 dark:text-emerald-400" : "bg-slate-50 dark:bg-slate-800 border-slate-200 dark:border-slate-700 text-slate-500"
+                      )}>
+                        {loan.scoring}/100
+                      </span>
+                    </div>
+                    <div className="p-4 flex items-center gap-2 uppercase font-black text-[9px] text-[var(--text-muted)]">
+                      {getStatusIcon(loan.status)}
+                      <span className="truncate">{loan.status.replace('_', ' ')}</span>
+                    </div>
+                    <div className="p-4 opacity-20 group-hover:opacity-100 group-hover:translate-x-1 transition-all">
+                      <ChevronRight className="w-4 h-4 text-[var(--text-main)]" />
+                    </div>
+                  </div>
                 </div>
-                <div className="p-4 text-right font-black text-[var(--text-main)] border-r border-[var(--border)] text-xs">
-                  {formatCurrency(loan.amount)}
-                </div>
-                <div className="p-4 text-center border-r border-[var(--border)]">
-                  <span className={cn(
-                    "font-black text-[8px] px-2 py-0.5 rounded-full border uppercase tracking-widest",
-                    loan.scoring > 80 ? "bg-emerald-500/10 border-emerald-200 dark:border-emerald-500/20 text-emerald-600 dark:text-emerald-400" : "bg-slate-50 dark:bg-slate-800 border-slate-200 dark:border-slate-700 text-slate-500"
-                  )}>
-                    {loan.scoring}/100
-                  </span>
-                </div>
-                <div className="p-4 flex items-center gap-2 uppercase font-black text-[9px] text-[var(--text-muted)]">
-                  {getStatusIcon(loan.status)}
-                  {loan.status.replace('_', ' ')}
-                </div>
-                <div className="p-4 opacity-20 group-hover:opacity-100 group-hover:translate-x-1 transition-all">
-                  <ChevronRight className="w-4 h-4 text-[var(--text-main)]" />
-                </div>
-              </div>
-            );
-          })
+              );
+            })}
+          </div>
         )}
       </div>
 
